@@ -20,7 +20,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "electron-updater": "^6.3.9"
+    "@react-buddy/ide-toolbox": "^2.4.0",
+    "electron-updater": "^6.3.9",
+    "react-router-dom": "^7.9.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",

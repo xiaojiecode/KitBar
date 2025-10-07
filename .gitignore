@@ -16,7 +16,8 @@ release
 
 # Editor directories and files
 .vscode/.debug.env
-.idea
+.idea/*
+!.idea/rcb-settings.xml
 .DS_Store
 *.suo
 *.ntvs*
