@@ -1,11 +1,11 @@
-import { BrowserWindow } from "electron";
 import path from "path";
+import { BrowserWindow } from 'electron';
 
 const windows = new Map<string, BrowserWindow>();
 
 export function createToolWindow(id: string, url: string) {
 	if (windows.has(id)) {
-		const win = windows.get(id)!;
+		const win = windows.get(id)!
 		win.show();
 		win.focus();
 		return win;
@@ -17,6 +17,13 @@ export function createToolWindow(id: string, url: string) {
 		show: true,
 		alwaysOnTop: true,
 		title: id,
+		frame: false, // 无边框窗口
+		// 暂时禁用透明效果以测试
+		transparent: false,
+		backgroundColor: '#ffffff', // 设置白色背景
+		// backgroundMaterial: 'acrylic', // 暂时禁用背景模糊效果
+		hasShadow: true, // 添加阴影
+		resizable: true, // 允许调整大小
 		webPreferences: {
 			preload: path.join(__dirname, "../preload/index.mjs"),
 		},

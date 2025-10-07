@@ -120,29 +120,29 @@ function AppContent() {
 		}
 	}, [location.pathname, navigate]);
 
-	// 主题切换按钮
+	// 主题切换按钮 - 扁平化设计
 	const renderThemeToggle = () => {
 		if (location.pathname !== '/') return null;
 		
 		return (
-			<div className="fixed bottom-4 right-4 z-50">
-				<div className="flex gap-2 bg-card rounded-full shadow-lg p-1">
+			<div className="fixed bottom-4 right-4 z-50 animate-fade-in-right-delay-300">
+				<div className="flex gap-1 bg-white dark:bg-card-dark rounded-lg shadow-flat p-1 transition-all duration-500 hover:shadow-flat-md hover:scale-105">
 					<button
-						className={`px-3 py-1 rounded-full text-sm transition-colors ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+						className={`px-3 py-1.5 rounded-md text-sm transition-all duration-300 ${theme === 'light' ? 'bg-primary text-white scale-105' : 'hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105'}`}
 						onClick={() => setTheme('light')}
 						aria-label="浅色模式"
 					>
 						☀️
 					</button>
 					<button
-						className={`px-3 py-1 rounded-full text-sm transition-colors ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+						className={`px-3 py-1.5 rounded-md text-sm transition-all duration-300 ${theme === 'dark' ? 'bg-primary text-white scale-105' : 'hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105'}`}
 						onClick={() => setTheme('dark')}
 						aria-label="深色模式"
 					>
 						🌙
 					</button>
 					<button
-						className={`px-3 py-1 rounded-full text-sm transition-colors ${theme === 'system' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+						className={`px-3 py-1.5 rounded-md text-sm transition-all duration-300 ${theme === 'system' ? 'bg-primary text-white scale-105' : 'hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105'}`}
 						onClick={() => setTheme('system')}
 						aria-label="跟随系统"
 					>
@@ -168,17 +168,81 @@ function AppContent() {
 }
 
 function App() {
-	return (
-		<div className="app-container">
-			<Router>
-				<ThemeProvider>
-					<WindowTypeProvider>
-						<AppContent />
-					</WindowTypeProvider>
-				</ThemeProvider>
-			</Router>
-		</div>
-	)
+  // 窗口控制函数
+  const handleCloseWindow = () => {
+    if (window.ipcRenderer) {
+      window.ipcRenderer.invoke('window:close');
+    } else {
+      // 网页环境下的降级处理
+      console.log('Close window requested');
+    }
+  };
+
+  const handleToggleAlwaysOnTop = () => {
+    if (window.ipcRenderer) {
+      window.ipcRenderer.invoke('window:toggle-always-on-top');
+    } else {
+      // 网页环境下的降级处理
+      console.log('Toggle always on top requested');
+    }
+  };
+
+  // 跟踪窗口置顶状态
+  const [isAlwaysOnTop, setIsAlwaysOnTop] = useState(false);
+
+  // 尝试获取并监听窗口置顶状态（如果支持）
+    useEffect(() => {
+      if (window.ipcRenderer) {
+        // 初始获取状态
+        window.ipcRenderer.invoke('window:get-always-on-top').then(setIsAlwaysOnTop);
+        
+        // 创建事件监听器函数
+        const handleAlwaysOnTopChanged = (_event: any, newState: boolean) => {
+          setIsAlwaysOnTop(newState);
+        };
+        
+        // 监听状态变化
+        window.ipcRenderer.on('window:always-on-top-changed', handleAlwaysOnTopChanged);
+        
+        // 清理函数
+        return () => {
+          window.ipcRenderer.off('window:always-on-top-changed', handleAlwaysOnTopChanged);
+        };
+      }
+    }, []);
+
+  return (
+    <div className="app-container">
+      <div className="window-drag-area"></div>
+      {/* 窗口控制按钮 - 扁平化设计 */}
+      <div className="window-controls">
+        <button 
+          className={`window-button maximize transition-all duration-300 ease-in-out hover:scale-125 hover:rotate-90 ${isAlwaysOnTop ? 'bg-accent text-white' : 'text-text-secondary dark:text-text-muted'}`}
+          onClick={handleToggleAlwaysOnTop}
+          aria-label={isAlwaysOnTop ? "取消窗口置顶" : "窗口置顶"}
+          title={isAlwaysOnTop ? "取消窗口置顶" : "窗口置顶"}
+        >
+          📌
+        </button>
+        <button 
+          className="window-button close transition-all duration-300 ease-in-out hover:scale-125 text-danger dark:text-danger"
+          onClick={handleCloseWindow}
+          aria-label="关闭窗口"
+          title="关闭窗口"
+        >
+          ✕
+        </button>
+      </div>
+      <Router>
+        <ThemeProvider>
+          <WindowTypeProvider>
+            <AppContent />
+          </WindowTypeProvider>
+        </ThemeProvider>
+      </Router>
+    </div>
+  )
 }
+
 
 export default App

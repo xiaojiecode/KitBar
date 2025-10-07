@@ -1,6 +1,6 @@
-import { ipcRenderer, contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron';
 
-// --------- Expose some API to the Renderer process ---------
+// --------- Expose some API to the Renderer process --------- 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args
@@ -48,7 +48,7 @@ const safeDOM = {
     if (Array.from(parent.children).find(e => e === child)) {
       return parent.removeChild(child)
     }
-  },
+  }
 }
 
 /**

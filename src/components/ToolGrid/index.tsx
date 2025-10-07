@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'
 import Tool from '@/components/Tool'
 import { useNavigate } from 'react-router-dom';
 
@@ -20,6 +20,12 @@ const tools: ToolItem[] = [
 
 const ToolGrid: React.FC = () => {
 	const navigate = useNavigate();
+	const [isVisible, setIsVisible] = useState(false);
+
+	// 当组件挂载时触发动画
+	useEffect(() => {
+		setIsVisible(true);
+	}, []);
 
 	// 检测是否是Windows系统
 	const isWindows = navigator.platform.includes('Win');
@@ -61,21 +67,27 @@ const ToolGrid: React.FC = () => {
 	};
 
 	return (
-		<div className="p-1 w-full min-h-screen">
+		<div className="p-6 pt-10 w-full no-drag">
 			<div
-				className="
+				className={`
 				select-none
 			  grid
-			  grid-cols-[repeat(auto-fit,minmax(72px,1fr))]
-			  gap-1
+			  grid-cols-[repeat(auto-fit,minmax(80px,1fr))]
+			  gap-3 sm:gap-4 md:gap-5
 			  justify-items-center
-			">
-				{tools.map((tool) => (
-					<Tool 
-						key={tool.id} 
-						{...tool} 
-						onClick={(e) => handleToolClick(e as React.MouseEvent, tool.id)} 
-					/>
+			  max-w-4xl
+			  mx-auto
+			  transition-all duration-700 ease-out
+			  ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-95'}
+			`}>
+				{tools.map((tool, index) => (
+					<div className={`transition-all duration-700 ease-out transform`} style={{ transitionDelay: `${index * 100}ms` }}>
+						<Tool 
+							key={tool.id} 
+							{...tool} 
+							onClick={(e) => handleToolClick(e as React.MouseEvent, tool.id)} 
+						/>
+					</div>
 				))}
 			</div>
 		</div>
